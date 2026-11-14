@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B6B4A">
+<meta name="description" content="Gestion de gains, épargne et investissement. Fonctionne hors-ligne.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Isra GF">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>Isra Gestion Financière</title>
+<style>
+:root{
+  --bg:#F5F6F2;--c:#fff;--t:#14201A;--m:#56635C;--l:#DDE2DC;
+  --a:#0B6B4A;--on:#fff;--r:#B3261E;--warn:#8A5B00;
+  box-sizing:border-box;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1411;--c:#17201B;--t:#EDF2EE;--m:#A2AFA8;--l:#2A3630;
+    --a:#3DBE8B;--on:#06231A;--r:#F2877F;--warn:#E0B662;
+    color-scheme:dark
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1411;--c:#17201B;--t:#EDF2EE;--m:#A2AFA8;--l:#2A3630;
+  --a:#3DBE8B;--on:#06231A;--r:#F2877F;--warn:#E0B662;
+  color-scheme:dark
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--t);
+  font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding-top:env(safe-area-inset-top,0px);
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior-y:contain
+}
+#app{max-width:480px;margin:0 auto;padding:16px 16px calc(120px + env(safe-area-inset-bottom,0px))}
+h1{font-size:22px;margin:0}
+h2{font-size:17px;margin:0 0 8px}
+.m{color:var(--m);font-size:13px}
+.c{background:var(--c);border:1px solid var(--l);border-radius:14px;padding:14px;margin-top:12px}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hero{background:var(--a);color:var(--on);border-radius:20px;padding:20px;margin-top:14px}
+.hero b{font-size:34px;display:block;margin:4px 0}
+button,input,select{font:inherit;color:var(--t)}
+.b{min-height:48px;border:0;border-radius:12px;background:var(--a);color:var(--on);font-weight:600;padding:0 18px;width:100%;cursor:pointer}
+.b.sec{background:var(--c);color:var(--t);border:1px solid var(--l)}
+.b.danger{background:var(--r);color:#fff}
+.k{min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--l);background:var(--c);cursor:pointer;color:var(--t)}
+.k[aria-pressed="true"]{background:var(--a);color:var(--on);border-color:var(--a)}
+input,select{width:100%;min-height:48px;border:1px solid var(--l);border-radius:12px;padding:0 12px;background:var(--c);margin:6px 0 12px}
+label{font-size:13px;color:var(--m);display:block}
+.bars{display:flex;gap:8px;align-items:flex-end;height:130px;margin-top:10px}
+.bars>div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px;font-size:11px;color:var(--m)}
+.bars i{display:block;width:100%;background:var(--a);border-radius:6px 6px 0 0;min-height:2px;transition:height .2s}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--l);gap:8px}
+.row:first-child{border-top:0}
+.x{background:none;border:0;color:var(--r);min-height:44px;min-width:44px;cursor:pointer;font-size:16px}
+.e{background:none;border:0;color:var(--m);min-height:44px;min-width:44px;cursor:pointer;font-size:16px}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:var(--c);border-top:1px solid var(--l);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;min-height:60px;border:0;background:none;font-size:12px;color:var(--m);cursor:pointer;padding:6px 0}
+nav button[aria-current="page"]{color:var(--a);font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.g{color:var(--a);font-weight:600}
+.o{color:var(--r);font-weight:600}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.mini{background:var(--c);border:1px solid var(--l);border-radius:12px;padding:10px;overflow:hidden}
+.mini .m{font-size:11px;margin-bottom:2px}
+.mini b{font-size:15px;word-break:break-word}
+.mini.neg b{color:var(--r)}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--l);color:var(--m);margin-left:6px}
+.month-h{font-size:13px;color:var(--m);margin:14px 0 4px;padding-top:8px;border-top:1px solid var(--l);font-weight:600;text-transform:capitalize}
+.month-h:first-child{border-top:0;padding-top:0;margin-top:0}
+</style>
+</head>
+<body>
+<noscript>
+  <div style="padding:20px;text-align:center;font-family:system-ui">
+    <h1>Isra Gestion Financière</h1>
+    <p>Cette application nécessite JavaScript activé.</p>
+  </div>
+</noscript>
+<main id="app"></main>
+<script>
+"use strict";
+
+/* ============ i18n ============ */
+const L = {
+fr:{
+home:"Accueil",hist:"Historique",add:"Ajouter",ideas:"Idées",set:"Réglages",
+total:"Total gagné",av:"Disponible",sav:"Épargne",inv:"Investissement",
+pool:"Capital d'investissement",day:"Jour",month:"Mois",year:"Année",
+in:"Gain",out:"Dépense",amt:"Montant",why:"Motif (ex. argent gagné en vendant une voiture)",cat:"Catégorie",date:"Date",from:"Depuis",
+save:"Enregistrer",cancel:"Annuler",edit:"Modifier",del:"Supprimer",
+confirm:"Supprimer cette opération ?",reset:"Effacer toutes les données",rc:"Tout effacer ?",
+bad:"Entrez un montant valide.",insufficient:"Solde insuffisant. Continuer quand même ?",
+empty:"Aucune opération. Ajoutez votre premier gain.",
+sale:"Vente",serv:"Service",sal:"Salaire",com:"Commission",oth:"Autre",
+food:"Nourriture",transport:"Transport",rent:"Loyer",health:"Santé",edu:"Éducation",
+gains:"Gains",outs:"Dépenses",net:"Net",split:"Répartition",
+bar:"Gains par période",mo:"mois",recent:"Récent",
+pct:"Les parts doivent être entre 0 et 100, et leur somme ne peut pas dépasser 100 %.",
+rate:"La devise change le symbole affiché ; les montants enregistrés ne sont pas convertis.",
+risk:"Risque",cap:"Capital",gn:"Gain estimé",dl:"Délai",r0:"Faible",r1:"Moyen",
+warn:"Propositions indicatives, sans garantie de gain. Ce n'est pas un conseil financier.",
+noidea:"Pas encore assez de capital d'investissement disponible.",
+name:"Nom de l'application",lang:"Langue",cur:"Devise",theme:"Thème",
+themeAuto:"Auto",themeLight:"Clair",themeDark:"Sombre",
+pe:"Part épargne (%)",pi:"Part investissement (%)",
+backup:"Sauvegarde",export:"Exporter",import:"Importer",importErr:"Fichier invalide.",
+importOk:"Importation réussie."
+},
+en:{
+home:"Home",hist:"History",add:"Add",ideas:"Ideas",set:"Settings",
+total:"Total earned",av:"Available",sav:"Savings",inv:"Investment",
+pool:"Investment capital",day:"Day",month:"Month",year:"Year",
+in:"Income",out:"Expense",amt:"Amount",why:"Reason (e.g. money earned selling a car)",cat:"Category",date:"Date",from:"From",
+save:"Save",cancel:"Cancel",edit:"Edit",del:"Delete",
+confirm:"Delete this entry?",reset:"Erase all data",rc:"Erase everything?",
+bad:"Enter a valid amount.",insufficient:"Insufficient balance. Continue anyway?",
+empty:"No entries yet. Add your first income.",
+sale:"Sale",serv:"Service",sal:"Salary",com:"Commission",oth:"Other",
+food:"Food",transport:"Transport",rent:"Rent",health:"Health",edu:"Education",
+gains:"Income",outs:"Expenses",net:"Net",split:"Split",
+bar:"Income by period",mo:"months",recent:"Recent",
+pct:"Shares must be between 0 and 100, and their sum cannot exceed 100%.",
+rate:"Changing the currency changes the symbol only; saved amounts are not converted.",
+risk:"Risk",cap:"Capital",gn:"Estimated gain",dl:"Time",r0:"Low",r1:"Medium",
+warn:"Suggestions are indicative, with no guaranteed return. This is not financial advice.",
+noidea:"Not enough investment capital available yet.",
+name:"App name",lang:"Language",cur:"Currency",theme:"Theme",
+themeAuto:"Auto",themeLight:"Light",themeDark:"Dark",
+pe:"Savings share (%)",pi:"Investment share (%)",
+backup:"Backup",export:"Export",import:"Import",importErr:"Invalid file.",
+importOk:"Import successful."
+},
+ln:{
+home:"Ebandeli",hist:"Lisolo",add:"Bakisa",ideas:"Mayele",set:"Bobongisi",
+total:"Mbongo ozwi nyonso",av:"Etikali",sav:"Mbongo ya kobomba",inv:"Kotya mbongo",
+pool:"Mbongo ya kotya",day:"Mokolo",month:"Sanza",year:"Mbula",
+in:"Mbongo ozwi",out:"Mbongo ebimi",amt:"Motango ya mbongo",why:"Ntina (ndakisa: mbongo ozwi na kolekisa motuka)",cat:"Lolenge",date:"Mokolo",from:"Utá",
+save:"Bomba",cancel:"Kotika",edit:"Kobongisa",del:"Kolongola",
+confirm:"Kolongola likambo oyo?",reset:"Kolongola makambo nyonso",rc:"Kolongola nyonso?",
+bad:"Tya motango ya malamu.",insufficient:"Mbongo ekoki te. Kokoba?",
+empty:"Ezali naino na eloko te. Bakisa mbongo ya liboso.",
+sale:"Koteka",serv:"Mosala",sal:"Mpako",com:"Komisio",oth:"Mosusu",
+food:"Bileyi",transport:"Mobembo",rent:"Ndako",health:"Bokono",edu:"Boyekoli",
+gains:"Mbongo ozwi",outs:"Mbongo ebimi",net:"Etikali",split:"Bokabwani",
+bar:"Mbongo ozwi na ntango",mo:"sanza",recent:"Sikawa",
+pct:"Biteni esengeli kozala kati ya 0 na 100, mpe motango na yango ekoki koleka 100 % te.",
+rate:"Mbongo (devise) ebongisaka kaka elembo; motango ya mbongo ebongisami te.",
+risk:"Likama",cap:"Mbongo ya ebandeli",gn:"Litomba oyo ekoki kozwama",dl:"Ntango",r0:"Moke",r1:"Katikati",
+warn:"Mayele oyo ezali kaka makanisi, litomba ezali garanti te. Yango ezali toli ya mbongo te.",
+noidea:"Mbongo ya kotya ekoki naino te.",
+name:"Nkombo ya application",lang:"Monoko",cur:"Mbongo (devise)",theme:"Lolenge ya langi",
+themeAuto:"Auto",themeLight:"Mpimba",themeDark:"Molili",
+pe:"Eteni ya kobomba (%)",pi:"Eteni ya kotya mbongo (%)",
+backup:"Kobomba",export:"Kobimisa",import:"Kokota",importErr:"Fichier ezali malamu te.",
+importOk:"Kokota esalemi malamu."
+}};
+
+/* ============ constants ============ */
+const IDEAS = [
+{c:100,k:0,g:[2,5],d:12,n:{fr:"Épargne placée (compte rémunéré)",en:"Interest-bearing savings",ln:"Mbongo ya kobomba na litomba"}},
+{c:300,k:0,g:[8,15],d:1,n:{fr:"Petit stock de produits courants",en:"Small stock of everyday goods",ln:"Biloko ya mokolo na mokolo mpo na koteka"}},
+{c:400,k:1,g:[15,30],d:2,n:{fr:"Service numérique (impression, photo, cyber)",en:"Digital service (printing, photos, cyber)",ln:"Mosala ya numérique (kobimisa, foto, cyber)"}},
+{c:500,k:1,g:[15,35],d:3,n:{fr:"Petit élevage ou maraîchage",en:"Small livestock or vegetable farming",ln:"Bobokoli ya nyama mike to elanga ya matiti"}},
+{c:1200,k:1,g:[10,25],d:2,n:{fr:"Revente de véhicules d'occasion",en:"Used vehicle resale",ln:"Koteka lisusu bamotuka ya kala"}},
+{c:1500,k:1,g:[20,40],d:6,n:{fr:"Transport (moto ou taxi)",en:"Transport (moto or taxi)",ln:"Mosala ya mobembo (moto to taxi)"}}
+];
+const RATE = {"$":1,"€":1,"FC":2800};
+const DEF = {name:"Isra Gestion Financière",lang:"fr",cur:"$",pe:20,pi:30,theme:"auto",period:"month",view:"home"};
+const K = "isra-gf";
+const KOLD = "isra-gf-v1";
+
+/* ============ helpers ============ */
+const $ = s => document.querySelector(s);
+const E = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const r2 = n => Math.round(n * 100) / 100;
+const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+const sanitizeId = id => {
+  const s = String(id);
+  return /^[a-zA-Z0-9_-]+$/.test(s) ? s : uid();
+};
+const iso = d => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+const sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
+const parseAmt = s => {
+  const v = String(s).trim().replace(/\s/g,"").replace(",", ".");
+  const n = Number(v);
+  if (!Number.isFinite(n) || n < 0 || n > 1e12) return NaN;
+  return n;
+};
+
+/* ============ state ============ */
+function normalizeTx(x) {
+  if (!x || typeof x !== "object") return null;
+  const type = x.type === "out" ? "out" : "in";
+  const amt = Number(x.amt);
+  if (!Number.isFinite(amt) || amt <= 0) return null;
+  const date = /^\d{4}-\d{2}-\d{2}/.test(String(x.date || "")) ? String(x.date).slice(0,10) : iso(new Date());
+  const se = r2(Number(x.se) || 0);
+  const si = r2(Number(x.si) || 0);
+  const bucket = ["av","sav","inv"].includes(x.bucket) ? x.bucket : "av";
+  return {
+    id: sanitizeId(x.id != null ? x.id : uid()),
+    type,
+    amt: r2(amt),
+    why: String(x.why || "").slice(0,120),
+    cat: String(x.cat || "oth"),
+    date,
+    se: type === "in" ? se : 0,
+    si: type === "in" ? si : 0,
+    bucket: type === "out" ? bucket : undefined
+  };
+}
+
+function normalizeSet(s) {
+  const out = {...DEF};
+  if (s && typeof s === "object") {
+    for (const k of Object.keys(DEF)) if (k in s) out[k] = s[k];
+  }
+  if (!["fr","en","ln"].includes(out.lang)) out.lang = DEF.lang;
+  if (!["$","€","FC"].includes(out.cur)) out.cur = DEF.cur;
+  if (!["auto","light","dark"].includes(out.theme)) out.theme = DEF.theme;
+  if (!["day","month","year"].includes(out.period)) out.period = DEF.period;
+  if (!["home","hist","add","ideas","set"].includes(out.view)) out.view = DEF.view;
+  out.name = String(out.name || DEF.name).slice(0,40) || DEF.name;
+  let pe = Math.max(0, Math.min(100, Number(out.pe) || 0));
+  let pi = Math.max(0, Math.min(100, Number(out.pi) || 0));
+  if (pe + pi > 100) pi = Math.max(0, 100 - pe);
+  out.pe = pe;
+  out.pi = pi;
+  return out;
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(K);
+    if (raw) {
+      const d = JSON.parse(raw);
+      const tx = Array.isArray(d.tx) ? d.tx.map(normalizeTx).filter(Boolean) : [];
+      return { tx, set: normalizeSet(d.set) };
+    }
+    const rawOld = localStorage.getItem(KOLD);
+    if (rawOld) {
+      const d = JSON.parse(rawOld);
+      const tx = Array.isArray(d.tx) ? d.tx.map(x => normalizeTx({...x, bucket: x.type === "out" ? "av" : undefined})).filter(Boolean) : [];
+      const st = { tx, set: normalizeSet(d.set) };
+      try { localStorage.setItem(K, JSON.stringify({v:2, tx: st.tx, set: st.set})); } catch(e) {}
+      return st;
+    }
+  } catch(e) {}
+  return { tx: [], set: {...DEF} };
+}
+
+let S = loadState();
+let editId = null;
+let TY = "in";
+
+function sv() {
+  try {
+    localStorage.setItem(K, JSON.stringify({v:2, tx: S.tx, set: S.set}));
+  } catch(e) {
+    console.warn("Save failed", e);
+    alert("Impossible d'enregistrer les données. Stockage plein ou navigation privée ?");
+  }
+}
+
+/* ============ i18n helpers ============ */
+const t = k => (L[S.set.lang] || L.fr)[k] ?? L.fr[k] ?? k;
+const fmtLocale = () => S.set.lang === "en" ? "en" : "fr";
+const docLang = () => S.set.lang;
+const _nfs = {};
+function fmt(n) {
+  const loc = fmtLocale();
+  const nf = _nfs[loc] || (_nfs[loc] = new Intl.NumberFormat(loc, {maximumFractionDigits: 2}));
+  return nf.format(r2(n)) + " " + S.set.cur;
+}
+const _dfs = {};
+function fmtDate(dateStr) {
+  const loc = fmtLocale();
+  const key = "d-" + loc;
+  const df = _dfs[key] || (_dfs[key] = new Intl.DateTimeFormat(loc, {day:"numeric", month:"short", year:"numeric"}));
+  return df.format(new Date(dateStr + "T12:00:00"));
+}
+function fmtMonth(ym) {
+  const loc = fmtLocale();
+  const key = "m-" + loc;
+  const df = _dfs[key] || (_dfs[key] = new Intl.DateTimeFormat(loc, {month:"long", year:"numeric"}));
+  return df.format(new Date(ym + "-15T12:00:00"));
+}
+
+/* ============ business logic ============ */
+const ins = () => S.tx.filter(x => x.type === "in");
+const outs = () => S.tx.filter(x => x.type === "out");
+
+function poche() {
+  let av = 0, sav = 0, inv = 0;
+  for (const x of S.tx) {
+    if (x.type === "in") {
+      av += x.amt - x.se - x.si;
+      sav += x.se;
+      inv += x.si;
+    } else {
+      const b = x.bucket || "av";
+      if (b === "sav") sav -= x.amt;
+      else if (b === "inv") inv -= x.amt;
+      else av -= x.amt;
+    }
+  }
+  return { av: r2(av), sav: r2(sav), inv: r2(inv) };
+}
+
+function bk() {
+  const n = new Date(), o = [];
+  const P = S.set.period;
+  if (P === "day") {
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(n.getFullYear(), n.getMonth(), n.getDate() - i);
+      o.push([iso(d), d.toLocaleDateString(fmtLocale(), {weekday:"short"})]);
+    }
+  } else if (P === "month") {
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(n.getFullYear(), n.getMonth() - i, 1);
+      o.push([iso(d).slice(0,7), d.toLocaleDateString(fmtLocale(), {month:"short"})]);
+    }
+  } else {
+    for (let i = 4; i >= 0; i--) {
+      const y = "" + (n.getFullYear() - i);
+      o.push([y, y]);
+    }
+  }
+  const l = P === "day" ? 10 : P === "month" ? 7 : 4;
+  const f = (a, k) => sum(a.filter(x => x.date.slice(0, l) === k), x => x.amt);
+  return o.map(([k, lb]) => ({lb, i: f(ins(), k), o: f(outs(), k)}));
+}
+
+/* ============ shared row ============ */
+function txRow(x) {
+  const isIn = x.type === "in";
+  const bucket = isIn ? "" : `<span class="badge">${t(x.bucket || "av")}</span>`;
+  return `<div class="row">
+    <div style="flex:1;min-width:0">
+      <div>${E(x.why || "—")}</div>
+      <div class="m">${E(t(x.cat))} · ${E(fmtDate(x.date))}${bucket}</div>
+    </div>
+    <div class="r" style="gap:0">
+      <span class="${isIn ? "g" : "o"}">${isIn ? "+" : "−"}${fmt(x.amt)}</span>
+      <button class="e" aria-label="${t("edit")}" onclick="goEdit('${x.id}')">✎</button>
+      <button class="x" aria-label="${t("del")}" onclick="del('${x.id}')">✕</button>
+    </div>
+  </div>`;
+}
+
+/* ============ views ============ */
+function home() {
+  const p = poche();
+  const b = bk();
+  const c = b[b.length - 1];
+  const mx = Math.max(1, ...b.map(x => x.i));
+  const total = sum(ins(), x => x.amt);
+  const recent = [...S.tx].sort((x, y) => y.date.localeCompare(x.date) || String(y.id).localeCompare(String(x.id))).slice(0, 3);
+  const period = S.set.period;
+  return `
+    <div class="hero">
+      <span>${t("total")}</span>
+      <b>${fmt(total)}</b>
+    </div>
+    <div class="grid3">
+      <div class="mini${p.av < 0 ? " neg" : ""}"><div class="m">${t("av")}</div><b>${fmt(p.av)}</b></div>
+      <div class="mini${p.sav < 0 ? " neg" : ""}"><div class="m">${t("sav")}</div><b>${fmt(p.sav)}</b></div>
+      <div class="mini${p.inv < 0 ? " neg" : ""}"><div class="m">${t("inv")}</div><b>${fmt(p.inv)}</b></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      ${["day","month","year"].map(x => `<button class="k" aria-pressed="${period === x}" onclick="setPeriod('${x}')">${t(x)}</button>`).join("")}
+    </div>
+    <div class="c">
+      <div class="r"><h2>${t("bar")}</h2></div>
+      <div class="r m">
+        <span>${t("gains")} <b class="g">${fmt(c.i)}</b></span>
+        <span>${t("outs")} <b class="o">${fmt(c.o)}</b></span>
+        <span>${t("net")} <b>${fmt(c.i - c.o)}</b></span>
+      </div>
+      <div class="bars" role="img" aria-label="${b.map(x => `${x.lb}: ${fmt(x.i)}`).join(", ")}">
+        ${b.map(x => `<div><i style="height:${Math.round(x.i / mx * 100)}%"></i>${E(x.lb)}</div>`).join("")}
+      </div>
+    </div>
+    ${recent.length ? `<div class="c"><h2>${t("recent")}</h2>${recent.map(txRow).join("")}</div>` : ""}
+  `;
+}
+
+function hist() {
+  const a = [...S.tx].sort((x, y) => y.date.localeCompare(x.date) || String(y.id).localeCompare(String(x.id)));
+  if (!a.length) return `<div class="c"><p class="m">${t("empty")}</p></div>`;
+  const groups = {};
+  for (const x of a) (groups[x.date.slice(0,7)] = groups[x.date.slice(0,7)] || []).push(x);
+  return `<div class="c">${Object.keys(groups).sort().reverse().map(k => {
+    const list = groups[k];
+    const inc = sum(list.filter(x => x.type === "in"), x => x.amt);
+    const out = sum(list.filter(x => x.type === "out"), x => x.amt);
+    return `<div class="month-h">${E(fmtMonth(k))} <span style="font-weight:400">· <span class="g">+${fmt(inc)}</span> · <span class="o">−${fmt(out)}</span></span></div>${list.map(txRow).join("")}`;
+  }).join("")}</div>`;
+}
+
+function add() {
+  if (editId && !S.tx.find(x => x.id === editId)) editId = null;
+  const e = editId ? S.tx.find(x => x.id === editId) : null;
+  const isIn = TY === "in";
+  const cats = isIn
+    ? ["sale","serv","sal","com","oth"]
+    : ["food","transport","rent","health","edu","oth"];
+  if (e && e.cat && Object.keys(L.fr).includes(e.cat) && !cats.includes(e.cat)) cats.push(e.cat);
+  const p = poche();
+  return `<div class="c">
+    ${e ? `<div class="r" style="margin-bottom:12px"><b>${t("edit")}</b><button class="k" onclick="cancelEdit()">${t("cancel")}</button></div>` : ""}
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="k" id="ti" aria-pressed="${isIn}" onclick="setT('in')">${t("in")}</button>
+      <button class="k" id="to" aria-pressed="${!isIn}" onclick="setT('out')">${t("out")}</button>
+    </div>
+    <label for="a">${t("amt")} (${S.set.cur})</label>
+    <input id="a" type="text" inputmode="decimal" value="${e ? E(String(e.amt)) : ""}" oninput="pv()">
+    <label for="w">${t("why")}</label>
+    <input id="w" maxlength="120" value="${e ? E(e.why) : ""}">
+    <label for="ct">${t("cat")}</label>
+    <select id="ct">${cats.map(k => `<option value="${k}"${e && e.cat === k ? " selected" : ""}>${t(k)}</option>`).join("")}</select>
+    ${!isIn ? `<label for="bucket">${t("from")}</label>
+      <select id="bucket">
+        <option value="av"${(!e || e.bucket === "av") ? " selected" : ""}>${t("av")} (${fmt(p.av)})</option>
+        <option value="sav"${e && e.bucket === "sav" ? " selected" : ""}>${t("sav")} (${fmt(p.sav)})</option>
+        <option value="inv"${e && e.bucket === "inv" ? " selected" : ""}>${t("inv")} (${fmt(p.inv)})</option>
+      </select>` : ""}
+    <label for="d">${t("date")}</label>
+    <input id="d" type="date" value="${e ? E(e.date) : iso(new Date())}">
+    <p class="m" id="pv" aria-live="polite"></p>
+    <button class="b" onclick="sa()">${t("save")}</button>
+  </div>`;
+}
+
+function ideas() {
+  const r = RATE[S.set.cur] || 1;
+  const p = poche().inv;
+  const l = IDEAS.filter(i => i.c * r <= p);
+  return `<div class="c"><div class="m">${t("pool")}</div><b>${fmt(p)}</b></div>` +
+    (l.length
+      ? l.map(i => `<div class="c">
+          <div class="r"><b>${E(i.n[S.set.lang] || i.n.fr)}</b><span class="m">${t("risk")}: ${t("r" + i.k)}</span></div>
+          <div class="r" style="margin-top:8px">
+            <div><div class="m">${t("cap")}</div>${fmt(i.c * r)}</div>
+            <div><div class="m">${t("gn")}</div><span class="g">${fmt(i.c * r * i.g[0] / 100)}–${fmt(i.c * r * i.g[1] / 100)}</span></div>
+            <div><div class="m">${t("dl")}</div>${i.d} ${t("mo")}</div>
+          </div>
+        </div>`).join("")
+      : `<div class="c m">${t("noidea")}</div>`) +
+    `<p class="m">${t("warn")}</p>`;
+}
+
+function set() {
+  const s = S.set;
+  return `<div class="c">
+    <label for="n">${t("name")}</label>
+    <input id="n" value="${E(s.name)}" maxlength="40" onchange="up('name',this.value)">
+    <label for="l">${t("lang")}</label>
+    <select id="l" onchange="up('lang',this.value)">
+      ${[["fr","Français"],["en","English"],["ln","Lingála"]].map(([k,v]) => `<option value="${k}"${s.lang === k ? " selected" : ""}>${v}</option>`).join("")}
+    </select>
+    <label for="u">${t("cur")}</label>
+    <select id="u" onchange="up('cur',this.value)">
+      ${["$","€","FC"].map(k => `<option${s.cur === k ? " selected" : ""}>${k}</option>`).join("")}
+    </select>
+    <label for="th">${t("theme")}</label>
+    <select id="th" onchange="up('theme',this.value)">
+      ${[["auto","themeAuto"],["light","themeLight"],["dark","themeDark"]].map(([k,v]) => `<option value="${k}"${s.theme === k ? " selected" : ""}>${t(v)}</option>`).join("")}
+    </select>
+    <label for="pe">${t("pe")}</label>
+    <input id="pe" type="number" min="0" max="100" value="${s.pe}" onchange="up('pe',this.value)">
+    <label for="pi">${t("pi")}</label>
+    <input id="pi" type="number" min="0" max="100" value="${s.pi}" onchange="up('pi',this.value)">
+    <p class="m">${t("rate")}</p>
+  </div>
+  <div class="c">
+    <h2>${t("backup")}</h2>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="b sec" onclick="doExport()">${t("export")}</button>
+      <button class="b sec" onclick="doImport()">${t("import")}</button>
+    </div>
+  </div>
+  <div class="c">
+    <button class="b danger" onclick="doReset()">${t("reset")}</button>
+  </div>`;
+}
+
+const VW = { home, hist, add, ideas, set };
+
+/* ============ theme ============ */
+function applyTheme() {
+  const th = S.set.theme || "auto";
+  if (th === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.dataset.theme = th;
+  syncThemeColor();
+}
+function syncThemeColor() {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (!meta) return;
+  let dark;
+  if (S.set.theme === "dark") dark = true;
+  else if (S.set.theme === "light") dark = false;
+  else dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  meta.setAttribute("content", dark ? "#0E1411" : "#0B6B4A");
+}
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", syncThemeColor); } catch(e) {}
+
+/* ============ render ============ */
+function R() {
+  document.title = S.set.name;
+  document.documentElement.lang = docLang();
+  const V = S.set.view;
+  const v = VW[V] || home;
+  $("#app").innerHTML = `<h1>${E(S.set.name)}</h1>
+    <div class="m">${new Date().toLocaleDateString(fmtLocale(), {weekday:"long", day:"numeric", month:"long", year:"numeric"})}</div>
+    ${v()}
+    <nav aria-label="Navigation">
+      ${["home","hist","add","ideas","set"].map(x => `<button aria-current="${V === x ? "page" : "false"}" onclick="go('${x}')">${t(x)}</button>`).join("")}
+    </nav>`;
+  if (V === "add") {
+    const ti = $("#ti"), to = $("#to");
+    if (ti) ti.setAttribute("aria-pressed", TY === "in");
+    if (to) to.setAttribute("aria-pressed", TY === "out");
+    pv();
+  }
+}
+
+/* ============ navigation ============ */
+function go(v) {
+  S.set.view = v;
+  editId = null;
+  if (v === "add") TY = "in";
+  sv();
+  R();
+  scrollTo(0, 0);
+}
+function goEdit(id) {
+  editId = String(id);
+  const x = S.tx.find(t => t.id === editId);
+  if (x) TY = x.type;
+  S.set.view = "add";
+  sv();
+  R();
+  scrollTo(0, 0);
+}
+function cancelEdit() { editId = null; go("home"); }
+
+/* ============ actions ============ */
+function up(k, v) {
+  if (k === "pe" || k === "pi") {
+    const n = Number(v);
+    const other = k === "pe" ? S.set.pi : S.set.pe;
+    if (!Number.isFinite(n) || n < 0 || n > 100 || n + other > 100) {
+      alert(t("pct"));
+      R();
+      return;
+    }
+    S.set[k] = r2(n);
+  } else if (k === "name") {
+    S.set.name = String(v).trim().slice(0,40) || DEF.name;
+  } else if (k === "theme") {
+    S.set.theme = v;
+    applyTheme();
+  } else {
+    S.set[k] = v;
+  }
+  sv();
+  R();
+}
+
+function setPeriod(p) { S.set.period = p; sv(); R(); }
+
+function setT(x) {
+  if (TY === x) return;
+  TY = x;
+  const amtEl = $("#a"), whyEl = $("#w"), dateEl = $("#d"), catEl = $("#ct");
+  const vals = {
+    amt: amtEl ? amtEl.value : "",
+    why: whyEl ? whyEl.value : "",
+    date: dateEl ? dateEl.value : "",
+    cat: catEl ? catEl.value : ""
+  };
+  R();
+  if ($("#a")) $("#a").value = vals.amt;
+  if ($("#w")) $("#w").value = vals.why;
+  if ($("#d") && vals.date) $("#d").value = vals.date;
+  const catEl2 = $("#ct");
+  if (catEl2) {
+    const opts = [...catEl2.options].map(o => o.value);
+    if (opts.includes(vals.cat)) catEl2.value = vals.cat;
+  }
+  pv();
+}
+
+function pv() {
+  const el = $("#a"), pvEl = $("#pv");
+  if (!el || !pvEl) return;
+  const a = parseAmt(el.value);
+  if (TY === "in" && Number.isFinite(a) && a > 0) {
+    const se = r2(a * S.set.pe / 100);
+    const si = r2(a * S.set.pi / 100);
+    const av = r2(a - se - si);
+    pvEl.textContent = `${t("split")} : ${t("sav")} ${fmt(se)} · ${t("inv")} ${fmt(si)} · ${t("av")} ${fmt(av)}`;
+  } else {
+    pvEl.textContent = "";
+  }
+}
+
+function sa() {
+  const a = parseAmt($("#a").value);
+  if (!(a > 0) || !Number.isFinite(a)) return alert(t("bad"));
+  const why = $("#w").value.trim();
+  const cat = $("#ct").value;
+  const date = $("#d").value || iso(new Date());
+
+  if (TY === "in") {
+    const se = r2(a * S.set.pe / 100);
+    const si = r2(a * S.set.pi / 100);
+    const tx = { type: "in", amt: r2(a), why, cat, date, se, si, bucket: undefined };
+    if (editId) {
+      const x = S.tx.find(t => t.id === editId);
+      if (x) Object.assign(x, tx);
+    } else {
+      S.tx.push({ id: uid(), ...tx });
+    }
+  } else {
+    const bucket = ($("#bucket") || {}).value || "av";
+    const p = poche();
+    if (a > p[bucket]) {
+      if (!confirm(t("insufficient"))) return;
+    }
+    const tx = { type: "out", amt: r2(a), why, cat, date, bucket, se: 0, si: 0 };
+    if (editId) {
+      const x = S.tx.find(t => t.id === editId);
+      if (x) Object.assign(x, tx);
+    } else {
+      S.tx.push({ id: uid(), ...tx });
+    }
+  }
+  editId = null;
+  TY = "in";
+  sv();
+  go("home");
+}
+
+function del(id) {
+  if (!confirm(t("confirm"))) return;
+  S.tx = S.tx.filter(x => x.id !== String(id));
+  sv();
+  R();
+}
+
+function doReset() {
+  if (!confirm(t("rc"))) return;
+  if (!confirm("⚠️ Confirmer la suppression définitive de toutes les données ?")) return;
+  S = { tx: [], set: {...DEF} };
+  editId = null;
+  sv();
+  applyTheme();
+  go("home");
+}
+
+function doExport() {
+  try {
+    const data = JSON.stringify({ app: "isra-gf", v: 2, tx: S.tx, set: S.set }, null, 2);
+    const blob = new Blob([data], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "isra-gf-backup-" + iso(new Date()) + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch(e) {
+    alert("Export échoué");
+  }
+}
+
+function doImport() {
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = "application/json,.json";
+  inp.onchange = async () => {
+    const f = inp.files && inp.files[0];
+    if (!f) return;
+    try {
+      const text = await f.text();
+      const data = JSON.parse(text);
+      if (!data || !Array.isArray(data.tx)) throw new Error("bad");
+      const tx = data.tx.map(normalizeTx).filter(Boolean);
+      const set = normalizeSet(data.set);
+      if (!confirm(`Importer ${tx.length} opération(s) ? Cela remplacera les données actuelles.`)) return;
+      S = { tx, set };
+      sv();
+      applyTheme();
+      go("home");
+    } catch(e) {
+      alert(t("importErr"));
+    }
+  };
+  inp.click();
+}
+
+/* ============ init ============ */
+applyTheme();
+R();
+
+/* ============ service worker ============ */
+if ("serviceWorker" in navigator &&
+    (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(e => console.warn("SW:", e));
+  });
+}
+</script>
+</body>
+</html>
